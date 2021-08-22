@@ -1,0 +1,10 @@
+no-tests = true
+
+[mysql]
+  dbname  = "clean-arch-api"
+  host    = "localhost"
+  port    = 3306
+  user    = "user"
+  pass    = "pass"
+  sslmode = "false"
+  no-auto-timestamps = "true"

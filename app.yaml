@@ -1,0 +1,12 @@
+service: default
+
+runtime: go115
+
+automatic_scaling:
+  max_instances: 50
+  target_cpu_utilization: 0.8 # default: 0.6
+  max_concurrent_requests: 80 # default: 10 max: 80
+  target_throughput_utilization: 0.8 # default: 0.6
+
+env_variables:
+  PORT: 8080

@@ -1,0 +1,17 @@
+---
+APP_ENV: local # local / test / develop / staging / production
+
+# DB / migrate
+DB_NAME: clean-arch-api
+DB_HOST: localhost
+DB_PORT: 3306
+DB_USER: root
+DB_PASS: pass
+DB_INSTANCE_NAME: INSTANCE:AREA:DB_NAME # CloudSQL
+MIGRATION_FILE_DIR: pkg/server/infra/store/mysql/schema
+
+# REDIS
+REDIS_PORT: 6379
+
+# API
+MaxRequestSize: 3000000 # 3 * 1000 * 1000 = 3MB

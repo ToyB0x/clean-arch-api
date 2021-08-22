@@ -1,0 +1,25 @@
+apiVersion: "apps/v1"
+kind: "Deployment"
+metadata:
+  name: locust-worker
+  labels:
+    name: locust-worker
+spec:
+  replicas: 30
+  selector:
+    matchLabels:
+      app: locust-worker
+  template:
+    metadata:
+      labels:
+        app: locust-worker
+    spec:
+      containers:
+        - name: locust-worker
+          # write your own {repository}/{project}/{image_name}
+          image: gcr.io/clean-arch-api-bench/locust-tasks
+          env:
+            - name: LOCUST_MODE
+              value: worker
+            - name: LOCUST_MASTER
+              value: locust-master
