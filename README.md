@@ -1,5 +1,6 @@
 ![Build workflow](https://github.com/toaru/clean-arch-api/actions/workflows/build.yml/badge.svg)
 ![Test workflow](https://github.com/toaru/clean-arch-api/actions/workflows/test.yml/badge.svg)
+[![codecov](https://codecov.io/gh/toaru/clean-arch-api/branch/master/graph/badge.svg?token=0BF4QVWNHI)](https://codecov.io/gh/toaru/clean-arch-api)
 
 # 概要
 - DDD/クリーンアーキテクチャでAPIサーバを実装

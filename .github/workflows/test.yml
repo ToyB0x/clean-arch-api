@@ -21,13 +21,10 @@ jobs:
         with:
           go-version: ${{ matrix.go-version }}
 
-      - name: Test
-        run: cd pkg/server/ && go test ./...
-
-#      - name: Test with Codecov
-#        run: cd server/ && go test server... --coverprofile=coverage.txt -covermode=atomic
-#      - uses: codecov/codecov-action@v1
-#        with:
-#          token: ${{ secrets.CODECOV_TOKEN }}
-#          flags: unittests
-#          name: codecov-umbrella
+      - name: Test with Codecov
+        run: go test ./... -race -coverprofile=coverage.txt -covermode=atomic
+      - uses: codecov/codecov-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          flags: unittests
+          name: codecov-umbrella
