@@ -1,4 +1,5 @@
 ---
+# NOTE: Switch DB connection type between TCP(on local)/Unix domain socket(on GCP production)
 APP_ENV: local # local / test / develop / staging / production
 
 # DB / migrate
