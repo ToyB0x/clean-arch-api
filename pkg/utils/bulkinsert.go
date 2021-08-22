@@ -6,8 +6,6 @@ import (
 	"log"
 	"time"
 
-	"github.com/golang-migrate/migrate/v4/database/mysql"
-
 	"github.com/toaru/clean-arch-api/config"
 
 	"github.com/volatiletech/sqlboiler/v4/boil"
@@ -17,35 +15,8 @@ import (
 
 	"github.com/toaru/clean-arch-api/pkg/server/infra/store/mysql/models"
 
-	"github.com/golang-migrate/migrate/v4"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 )
-
-func MigrateUp(filePath string) error {
-	m, err := getMigrateInstance("file://" + filePath)
-	if err != nil {
-		return err
-	}
-	return m.Up()
-}
-
-func MigrateDrop(filePath string) error {
-	m, err := getMigrateInstance("file://" + filePath)
-	if err != nil {
-		return err
-	}
-	return m.Drop()
-}
-
-func getMigrateInstance(filePath string) (*migrate.Migrate, error) {
-	con := store.NewSqlHandler(config.Configs.APP_ENV).Conn
-	driver, _ := mysql.WithInstance(con, &mysql.Config{})
-	return migrate.NewWithDatabaseInstance(
-		filePath,
-		"clean-arch-api",
-		driver,
-	)
-}
 
 func BulkInsertSchedules(startDate time.Time, totalDays int, hours, mins []int, maxAvailable int) error {
 	rowNum := totalDays * len(hours) * len(mins)
