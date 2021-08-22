@@ -8,6 +8,7 @@
 - DBパフォーマンスの劣化測定(1000万レコード下でのインサート速度測定)
 
 <p align="center"><img src="./docs/locust_result.png" alt="locust result"></p>
+
 - 対策前(左):  753RPS, 229Failures/s (エラーレート 30%以上)
 - 対策後(右): 1011RPS,  25Failures/s (エラーレート  2%程度)
 
