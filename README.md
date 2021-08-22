@@ -3,16 +3,13 @@
 
 # 概要
 - DDD/クリーンアーキテクチャでAPIサーバを実装
-- 負荷対策にRedisを利用したキャッシュシステムを実装(下図右側でエラー抑止)
+- 負荷対策のキャッシュシステムを実装(下図右側: エラーレート改善)
 - 負荷テストを導入(locust/GKE等利用)
 - DBパフォーマンスの劣化測定(1000万レコード下でのインサート速度測定)
 
 <p align="center"><img src="./docs/locust_result.png" alt="locust result"></p>
-
-- 対策前(左):  753RPS, 229Failures/s (エラー率 30%以上)
-- 対策後(右): 1011RPS,  25Failures/s (エラー率 2%程度)
-- 機器: CPU: Ryzen7(3.1GHz/8core) MEM: 64GB
-- シナリオ: 〜3000userによるカレンダー閲覧/予約作成 (詳細は`./docker/loadtest/locustfile.py`)
+- 対策前(左):  753RPS, 229Failures/s (エラーレート 30%以上)
+- 対策後(右): 1011RPS,  25Failures/s (エラーレート  2%程度)
 
 # APIの想定サービス
 シンプルな機能なため話題となったワクチン大規模接種会場の予約システムがテーマ  
@@ -45,7 +42,7 @@ cd ./docker/server
 docker-compose up
 ```
 
-## DBテスト用のコマンド類, 
+## DBテスト用のコマンド類
 ```shell
 # bulk insert test data: schedules
 go run main.go insert-schedules
