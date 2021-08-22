@@ -2,21 +2,22 @@ package usecase_test
 
 import (
 	"context"
+	"encoding/json"
+	"github.com/friendsofgo/errors"
 	"reflect"
 	"testing"
 
-	"github.com/toaru/clean-arch-api/pkg/server/domain/service"
 	mock2 "github.com/toaru/clean-arch-api/pkg/server/infra/memstore/mock"
 	"github.com/toaru/clean-arch-api/pkg/server/infra/store/mock"
 
+	"github.com/toaru/clean-arch-api/pkg/server/domain/model"
 	"github.com/toaru/clean-arch-api/pkg/server/usecase"
 
-	"github.com/toaru/clean-arch-api/pkg/server/domain/model"
-
 	"github.com/toaru/clean-arch-api/pkg/server/domain/repository"
+	"github.com/toaru/clean-arch-api/pkg/server/domain/service"
 )
 
-func Test_NewScheduleUsecase(t *testing.T) {
+func TestNewScheduleUsecase(t *testing.T) {
 	type args struct {
 		scheduleRepo      repository.ScheduleRepository
 		reservationRepo   repository.ReservationRepository
@@ -42,7 +43,7 @@ func Test_NewScheduleUsecase(t *testing.T) {
 	}
 }
 
-func Test_scheduleUsecase_GetByMonth(t *testing.T) {
+func TestGetByMonth(t *testing.T) {
 	// test data
 	schedule := model.Schedule{
 		ID:           "1",
@@ -100,7 +101,7 @@ func Test_scheduleUsecase_GetByMonth(t *testing.T) {
 	}
 }
 
-func Test_scheduleUsecase_GetByID(t *testing.T) {
+func TestGetByMonthMemStore(t *testing.T) {
 	// test data
 	schedule := model.Schedule{
 		ID:           "1",
@@ -114,33 +115,72 @@ func Test_scheduleUsecase_GetByID(t *testing.T) {
 			Min:   20,
 		},
 	}
+	schedules := []model.Schedule{schedule}
+	schedulesJson, err := json.Marshal(schedules)
+	if err != nil {
+		panic(err)
+	}
+
 	type fields struct {
 		scheduleRepo    repository.ScheduleRepository
 		reservationRepo repository.ReservationRepository
+		memStoreService service.MemStoreService
 	}
 	type args struct {
-		ctx context.Context
-		id  string
+		ctx         context.Context
+		year, month int
 	}
 	tests := []struct {
 		name   string
 		fields fields
 		args   args
-		want   *model.Schedule
+		want   []model.Schedule
 	}{
-		{"success",
+		{"hit cache",
 			fields{
+				memStoreService: &mock2.MemStoreService{
+					OnGet: func(key string) ([]byte, error) {
+						return schedulesJson, nil
+					},
+					OnAdd: func(key string, value []byte, sec int) error {
+						return nil
+					},
+				},
 				scheduleRepo: &mock.ScheduleStore{
-					OnFindByID: func(ctx context.Context, id string) (*model.Schedule, error) {
-						return &schedule, nil
+					OnFindByMonth: func(ctx context.Context, year, month int) ([]model.Schedule, error) {
+						return schedules, nil
 					},
 				},
 			},
 			args{
-				ctx: context.Background(),
-				id:  "1",
+				ctx:   context.Background(),
+				year:  2020,
+				month: 1,
 			},
-			&schedule,
+			schedules,
+		},
+		{"no hit cache",
+			fields{
+				memStoreService: &mock2.MemStoreService{
+					OnGet: func(key string) ([]byte, error) {
+						return nil, errors.New("no cache")
+					},
+					OnAdd: func(key string, value []byte, sec int) error {
+						return nil
+					},
+				},
+				scheduleRepo: &mock.ScheduleStore{
+					OnFindByMonth: func(ctx context.Context, year, month int) ([]model.Schedule, error) {
+						return schedules, nil
+					},
+				},
+			},
+			args{
+				ctx:   context.Background(),
+				year:  2020,
+				month: 1,
+			},
+			schedules,
 		},
 	}
 	for _, tt := range tests {
@@ -148,9 +188,10 @@ func Test_scheduleUsecase_GetByID(t *testing.T) {
 			u := &usecase.ScheduleUsecaseExport{
 				ScheduleRepo:    tt.fields.scheduleRepo,
 				ReservationRepo: tt.fields.reservationRepo,
+				MemStoreService: tt.fields.memStoreService,
 			}
-			if got, _ := u.GetByID(tt.args.ctx, tt.args.id); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("GetByID = %v, want %v", got, tt.want)
+			if got, _ := u.GetByMonthMemStore(tt.args.ctx, tt.args.year, tt.args.month); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("GetByMonth() = %v, want %v", got, tt.want)
 			}
 		})
 	}
